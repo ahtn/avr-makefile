@@ -5,28 +5,6 @@
 # Wunsch, et al which is released under the Public Domain.
 #
 
-# Object files directory
-OBJ_DIR = $(BUILD_DIR)/$(BOARD)-$(MCU)/obj
-
-# Director were output files are placed
-BUILD_TARGET_DIR = $(BUILD_DIR)/$(BOARD)-$(MCU)
-
-# Where dependency files are placed
-DEP_DIR = $(OBJ_DIR)/.dep
-
-#######################################################################
-#                         Target output files                         #
-#######################################################################
-
-TARGET_HEX = $(BUILD_TARGET_DIR)/$(TARGET).hex
-TARGET_ELF = $(BUILD_TARGET_DIR)/$(TARGET).elf
-TARGET_FUSE = $(BUILD_TARGET_DIR)/$(TARGET).fuse
-TARGET_LOCK = $(BUILD_TARGET_DIR)/$(TARGET).lock
-TARGET_EEP = $(BUILD_TARGET_DIR)/$(TARGET).eep
-TARGET_LSS = $(BUILD_TARGET_DIR)/$(TARGET).lss
-TARGET_SYM = $(BUILD_TARGET_DIR)/$(TARGET).sym
-TARGET_MAP = $(BUILD_TARGET_DIR)/$(TARGET).map
-
 #######################################################################
 #                          Compiler Options                           #
 #######################################################################
@@ -296,13 +274,6 @@ clean:
 	$(REMOVE) $(TARGET_MAP)
 	$(REMOVEDIR) $(OBJ_DIR)
 	$(REMOVEDIR) $(DEP_DIR)
-
-# program a board using an external programmer
-program: $(TARGET_HEX)
-	$(AVRDUDE_CMD) -U flash:w:$<:i
-
-erase:
-	$(AVRDUDE_CMD) -e
 
 # Include the dependency files.
 -include $(wildcard $(DEP_DIR)/*)
