@@ -3,16 +3,33 @@
 
 # Based on the WinAVR Makefile Template written by Eric B. Weddington, Jörg
 # Wunsch, et al which is released under the Public Domain.
+#
 
-#---------------- Target output files ----------------
-TARGET_HEX = $(BUILD_DIR)/$(TARGET).hex
-TARGET_ELF = $(BUILD_DIR)/$(TARGET).elf
-TARGET_FUSE = $(BUILD_DIR)/$(TARGET).fuse
-TARGET_LOCK = $(BUILD_DIR)/$(TARGET).lock
-TARGET_EEP = $(BUILD_DIR)/$(TARGET).eep
-TARGET_LSS = $(BUILD_DIR)/$(TARGET).lss
-TARGET_SYM = $(BUILD_DIR)/$(TARGET).sym
-TARGET_MAP = $(BUILD_DIR)/$(TARGET).map
+# Object files directory
+OBJ_DIR = $(BUILD_DIR)/$(BOARD)-$(MCU)/obj
+
+# Director were output files are placed
+BUILD_TARGET_DIR = $(BUILD_DIR)/$(BOARD)-$(MCU)
+
+# Where dependency files are placed
+DEP_DIR = $(OBJ_DIR)/.dep
+
+#######################################################################
+#                         Target output files                         #
+#######################################################################
+
+TARGET_HEX = $(BUILD_TARGET_DIR)/$(TARGET).hex
+TARGET_ELF = $(BUILD_TARGET_DIR)/$(TARGET).elf
+TARGET_FUSE = $(BUILD_TARGET_DIR)/$(TARGET).fuse
+TARGET_LOCK = $(BUILD_TARGET_DIR)/$(TARGET).lock
+TARGET_EEP = $(BUILD_TARGET_DIR)/$(TARGET).eep
+TARGET_LSS = $(BUILD_TARGET_DIR)/$(TARGET).lss
+TARGET_SYM = $(BUILD_TARGET_DIR)/$(TARGET).sym
+TARGET_MAP = $(BUILD_TARGET_DIR)/$(TARGET).map
+
+#######################################################################
+#                          Compiler Options                           #
+#######################################################################
 
 #---------------- Compiler Options C ----------------
 #  -g*:          generate debugging information
@@ -70,6 +87,25 @@ LDFLAGS += -Wl,-Map=$(TARGET_MAP),--cref
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += -flto
 
+#---------------- common defines ----------------
+# Place -D or -U options here for C sources
+CDEFS += -DF_CPU=$(F_CPU)UL
+CDEFS += -DF_USB=$(F_USB)UL
+CDEFS += -DBOARD=BOARD_$(BOARD)
+CDEFS += -DARCH=ARCH_$(ARCH)
+CDEFS += -D __$(DEVICE)__
+
+# Place -D or -U options here for ASM sources
+ADEFS  = -DF_CPU=$(F_CPU)
+ADEFS += -DF_USB=$(F_USB)UL
+ADEFS += -DBOARD=BOARD_$(BOARD)
+ADEFS += -DARCH=ARCH_$(ARCH)
+ADEFS += -D __$(DEVICE)__
+
+#######################################################################
+#                              obj files                              #
+#######################################################################
+
 #Create lists of object files need to build the program
 C_OBJ_FILES = $(patsubst %.c, $(OBJ_DIR)/%.o, $(C_SRC))
 C_LST_FILES = $(patsubst %.c, $(OBJ_DIR)/%.lst, $(C_SRC))
@@ -79,7 +115,9 @@ ASM_LST_FILES = $(patsubst %.S, $(OBJ_DIR)/%.lst, $(ASM_SRC))
 OBJ = $(C_OBJ_FILES) $(ASM_OBJ_FILES)
 LST = $(C_LST_FILES) $(ASM_LST_FILES)
 
-#============================================================================
+#######################################################################
+#                        programs and commands                        #
+#######################################################################
 
 # Define programs and commands.
 CC = avr-gcc
@@ -107,18 +145,22 @@ MSG_ASSEMBLING = Assembling:
 MSG_CLEANING = Cleaning project:
 MSG_CREATING_LIBRARY = Creating library:
 
-
-DEP_DIR = $(OBJ_DIR)/.dep
+#######################################################################
+#                             extra flags                             #
+#######################################################################
 
 # Compiler flags to generate dependency files.
 GENDEPFLAGS = -MMD -MP -MF $(DEP_DIR)/$(@F).d
-
 
 # Combine all necessary flags and optional flags.
 # Add target processor to flags.
 ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS) $(GENDEPFLAGS)
 ALL_CPPFLAGS = -mmcu=$(MCU) -I. -x c++ $(CPPFLAGS) $(GENDEPFLAGS)
 ALL_ASFLAGS = -mmcu=$(MCU) -I. -x assembler-with-cpp $(ASFLAGS)
+
+#######################################################################
+#                              recepies                               #
+#######################################################################
 
 # Default target.
 all: build
@@ -128,16 +170,16 @@ build: elf hex
 #eep lss sym
 #build: lib
 
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+$(BUILD_TARGET_DIR):
+	mkdir -p $(BUILD_TARGET_DIR)
 
-elf: $(BUILD_DIR) $(TARGET_ELF)
-hex: $(BUILD_DIR) $(TARGET_HEX) pretty_size
-fuse: $(BUILD_DIR) $(TARGET_FUSE)
-lock: $(BUILD_DIR) $(TARGET_LOCK)
-eep: $(BUILD_DIR) $(TARGET_EEP)
-lss: $(BUILD_DIR) $(TARGET_LSS)
-sym: $(BUILD_DIR) $(TARGET_SYM)
+elf: $(BUILD_TARGET_DIR) $(TARGET_ELF)
+hex: $(BUILD_TARGET_DIR) $(TARGET_HEX) pretty_size
+fuse: $(BUILD_TARGET_DIR) $(TARGET_FUSE)
+lock: $(BUILD_TARGET_DIR) $(TARGET_LOCK)
+eep: $(BUILD_TARGET_DIR) $(TARGET_EEP)
+lss: $(BUILD_TARGET_DIR) $(TARGET_LSS)
+sym: $(BUILD_TARGET_DIR) $(TARGET_SYM)
 LIBNAME=lib$(TARGET).a
 lib: $(LIBNAME)
 
@@ -255,6 +297,12 @@ clean:
 	$(REMOVEDIR) $(OBJ_DIR)
 	$(REMOVEDIR) $(DEP_DIR)
 
+# program a board using an external programmer
+program: $(TARGET_HEX)
+	$(AVRDUDE_CMD) -U flash:w:$<:i
+
+erase:
+	$(AVRDUDE_CMD) -e
 
 # Include the dependency files.
 -include $(wildcard $(DEP_DIR)/*)
