@@ -42,11 +42,11 @@ CDEFS += -DMCU_STRING=\"$(MCU_STRING)\"
 
 program-fuses:
 	$(AVRDUDE_CMD) \
-		-U fuse0:w:0x$(FUSE0):m \
-		-U fuse1:w:0x$(FUSE1):m \
-		-U fuse2:w:0x$(FUSE2):m \
-		-U fuse4:w:0x$(FUSE4):m \
-		-U fuse5:w:0x$(FUSE5):m
+		-U fuse0:w:"0x$(FUSE0)":m \
+		-U fuse1:w:"0x$(FUSE1)":m \
+		-U fuse2:w:"0x$(FUSE2)":m \
+		-U fuse4:w:"0x$(FUSE4)":m \
+		-U fuse5:w:"0x$(FUSE5)":m
 
 program-lock:
 	$(AVRDUDE_CMD) -U lock:w:"0x$(LOCKBITS)":m
