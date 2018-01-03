@@ -168,8 +168,9 @@ ELFSIZE = $(SIZE) $(MCU_FLAG) $(FORMAT_FLAG) $(TARGET_ELF)
 MCU_FLAG = $(shell $(SIZE) --help | grep -- --mcu > /dev/null && echo --mcu=$(MCU) )
 FORMAT_FLAG = $(shell $(SIZE) --help | grep -- --format=.*avr > /dev/null && echo --format=avr )
 
-OLD_FLASH_SIZE = $(OBJ_DIR)/.old_flash_size.o
-OLD_RAM_SIZE = $(OBJ_DIR)/.old_ram_size.o
+BUILD_IDENTIFIER = $(BUILD_DIR)_$(BOARD)_$(MCU)
+OLD_FLASH_SIZE = $(BUILD_DIR)/.old_flash_size_$(BUILD_IDENTIFIER).o
+OLD_RAM_SIZE = $(BUILD_DIR)/.old_ram_size_$(BUILD_IDENTIFIER).o
 pretty_size: # would be nice to add get total ram size
 	@if test -f $(TARGET_ELF); then \
         echo "=== ELF Size Information ($(TARGET)) ==="; \
