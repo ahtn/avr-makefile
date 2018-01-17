@@ -235,6 +235,10 @@ pretty_size: # would be nice to add get total ram size
 	$(NM) -n $< > $@
 
 
+# Treat the makefiles as dependencies to all object files so that the project
+# will be rebuilt automatically
+$(OBJ): $(MAKEFILE_INC)
+
 # Link: create ELF output file from object files.
 .SECONDARY : $(TARGET_ELF)
 .PRECIOUS : $(OBJ)

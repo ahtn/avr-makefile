@@ -30,7 +30,9 @@ ifndef BUILD_DIR
 endif
 
 ifneq ("$(wildcard boards/$(BOARD)/config.mk)","")
-    include $(BOARD_DIR)/$(BOARD)/config.mk
+    BOARD_MAKEFILE=$(BOARD_DIR)/$(BOARD)/config.mk
+    include $(BOARD_MAKEFILE)
+    MAKEFILE_INC += $(BOARD_MAKEFILE)
     TARGET = $(TARGET_BASE_NAME)-$(BOARD)-$(MCU)
 else
     $(error "Unknown board $(BOARD)")
