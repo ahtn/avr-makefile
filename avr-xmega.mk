@@ -33,11 +33,7 @@ else ifeq ($(MCU), atxmega128a4u)
   AVRDUDE_PART = x128a4
   MCU_STRING = "ATxmega128a4u"
   MCU_FLASH_SIZE = 128
-  # NOTE: avr-gcc says atxmega128a4u -> avrxmega7, but it also says avrxmega7
-  # is for devices with more than 128KiB program memory and more than 64KiB
-  # of RAM. So avrxmega7 is probably used with external RAM
-  # LD_SCRIPT = avrxmega7.xn
-  LD_SCRIPT = avrxmega6.xn
+  LD_SCRIPT = avrxmega7.xn
 else
   $(error No part matches MCU='$(MCU)')
 endif
