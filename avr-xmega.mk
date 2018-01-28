@@ -38,6 +38,7 @@ else
   $(error No part matches MCU='$(MCU)')
 endif
 
+CDEFS += -DMCU_FLASH_SIZE=128
 CDEFS += -DMCU_STRING=\"$(MCU_STRING)\"
 
 ifndef AVRDUDE_DEVICE_FUSES
