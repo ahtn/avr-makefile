@@ -31,6 +31,7 @@ endif
 
 ifneq ("$(wildcard boards/$(BOARD)/config.mk)","")
     BOARD_MAKEFILE=$(BOARD_DIR)/$(BOARD)/config.mk
+    INC_PATHS += -I$(BOARD_DIR)/$(BOARD)
     include $(BOARD_MAKEFILE)
     MAKEFILE_INC += $(BOARD_MAKEFILE)
     TARGET = $(TARGET_BASE_NAME)-$(BOARD)-$(MCU)
@@ -50,4 +51,3 @@ TARGET_EEP = $(BUILD_TARGET_DIR)/$(TARGET).eep
 TARGET_LSS = $(BUILD_TARGET_DIR)/$(TARGET).lss
 TARGET_SYM = $(BUILD_TARGET_DIR)/$(TARGET).sym
 TARGET_MAP = $(BUILD_TARGET_DIR)/$(TARGET).map
-
