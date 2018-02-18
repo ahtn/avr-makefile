@@ -1,8 +1,9 @@
 # program a board using an external programmer
-programmer: $(TARGET_HEX)
+program-hard: $(TARGET_HEX)
 	$(AVRDUDE_CMD) -U flash:w:$<:i
 
-programmer-erase:
+# erase a board using an external programmer
+program-erase:
 	$(AVRDUDE_CMD) -e
 
 # readback flash and eeprom
