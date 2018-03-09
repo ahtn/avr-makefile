@@ -254,6 +254,8 @@ $(OBJ_DIR)/%.o : %.c
 	@mkdir -p $(dir $@)
 	@mkdir -p $(DEP_DIR)
 	$(CC) -c $(ALL_CFLAGS) $< -o $@
+	# TODO:
+	# $(CC) -S $(ALL_CFLAGS) $< -o $@.asm -fverbose-asm # generate asm as well
 
 # Assemble: create object files from assembler source files.
 $(OBJ_DIR)/%.o : %.S

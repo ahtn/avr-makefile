@@ -15,7 +15,7 @@ readback:
 
 .PHONY:
 program-fuses:
-	$(AVRDUDE_CMD) $(AVRDUDE_DEVICE_FUSE)
+	$(AVRDUDE_CMD) $(AVRDUDE_DEVICE_FUSES)
 
 .PHONY:
 program-lock:
