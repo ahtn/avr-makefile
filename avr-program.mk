@@ -1,5 +1,8 @@
 # program a board using an external programmer
 program-hard: $(TARGET_HEX)
+	$(AVRDUDE_CMD) -e -U flash:w:$<:i
+
+program-hard-no-erase: $(TARGET_HEX)
 	$(AVRDUDE_CMD) -U flash:w:$<:i
 
 # erase a board using an external programmer
