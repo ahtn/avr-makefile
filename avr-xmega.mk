@@ -38,8 +38,24 @@ else ifeq ($(MCU), atxmega128a4u)
   MCU_FLASH_SIZE = 128
   LD_SCRIPT = avrxmega7.xn
   XMEGA_PIN_COUNT = 44
+else ifeq ($(MCU), atxmega32c3)
+  BOOT_SECTION_START = 0x008000
+  BOOTLOADER_SIZE = 0x1000
+  AVRDUDE_PART = x32c3
+  LD_SCRIPT = avrxmega2.xn
+  MCU_STRING = ATxmega32C3
+  MCU_FLASH_SIZE = 32
+  XMEGA_PIN_COUNT = 64
+else ifeq ($(MCU), atxmega64c3)
+  BOOT_SECTION_START = 0x010000
+  BOOTLOADER_SIZE = 0x1000
+  AVRDUDE_PART = x64c3
+  LD_SCRIPT = avrxmega4.xn
+  MCU_STRING = ATxmega64C3
+  MCU_FLASH_SIZE = 64
+  XMEGA_PIN_COUNT = 64
 else
-  $(error No part matches MCU='$(MCU)')
+  $(error No part matches MCU='$(MCU)' (note needs to be lower case))
 endif
 
 CDEFS += -DMCU_FLASH_SIZE=$(MCU_FLASH_SIZE)

@@ -5,6 +5,10 @@
 # Wunsch, et al which is released under the Public Domain.
 #
 
+ifndef AVR_MKFILE_DIR
+  AVR_MKFILE_DIR = ./avr-makefile
+endif
+
 #######################################################################
 #                          Compiler Options                           #
 #######################################################################
