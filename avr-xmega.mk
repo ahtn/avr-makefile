@@ -14,6 +14,7 @@ ifeq ($(MCU), atxmega16a4u)
   MCU_STRING = ATxmega16A4U
   MCU_FLASH_SIZE = 16
   XMEGA_PIN_COUNT = 44
+  XMEGA_SERIES = A
 else ifeq ($(MCU), atxmega32a4u)
   BOOT_SECTION_START = 0x008000
   BOOTLOADER_SIZE = 0x1000
@@ -22,6 +23,7 @@ else ifeq ($(MCU), atxmega32a4u)
   MCU_STRING = ATxmega32A4U
   MCU_FLASH_SIZE = 32
   XMEGA_PIN_COUNT = 44
+  XMEGA_SERIES = A
 else ifeq ($(MCU), atxmega64a4u)
   BOOT_SECTION_START = 0x010000
   BOOTLOADER_SIZE = 0x1000
@@ -30,6 +32,7 @@ else ifeq ($(MCU), atxmega64a4u)
   MCU_STRING = ATxmega64A4U
   MCU_FLASH_SIZE = 64
   XMEGA_PIN_COUNT = 44
+  XMEGA_SERIES = A
 else ifeq ($(MCU), atxmega128a4u)
   BOOT_SECTION_START = 0x020000
   BOOTLOADER_SIZE = 0x2000
@@ -38,6 +41,7 @@ else ifeq ($(MCU), atxmega128a4u)
   MCU_FLASH_SIZE = 128
   LD_SCRIPT = avrxmega7.xn
   XMEGA_PIN_COUNT = 44
+  XMEGA_SERIES = A
 else ifeq ($(MCU), atxmega32c3)
   BOOT_SECTION_START = 0x008000
   BOOTLOADER_SIZE = 0x1000
@@ -46,6 +50,7 @@ else ifeq ($(MCU), atxmega32c3)
   MCU_STRING = ATxmega32C3
   MCU_FLASH_SIZE = 32
   XMEGA_PIN_COUNT = 64
+  XMEGA_SERIES = C
 else ifeq ($(MCU), atxmega64c3)
   BOOT_SECTION_START = 0x010000
   BOOTLOADER_SIZE = 0x1000
@@ -54,6 +59,7 @@ else ifeq ($(MCU), atxmega64c3)
   MCU_STRING = ATxmega64C3
   MCU_FLASH_SIZE = 64
   XMEGA_PIN_COUNT = 64
+  XMEGA_SERIES = C
 else
   $(error No part matches MCU='$(MCU)' (note needs to be lower case))
 endif
@@ -63,12 +69,23 @@ CDEFS += -DMCU_STRING=\"$(MCU_STRING)\"
 CDEFS += -DXMEGA_PIN_COUNT=$(XMEGA_PIN_COUNT)
 
 ifndef AVRDUDE_DEVICE_FUSES
-AVRDUDE_DEVICE_FUSES=\
-        -U fuse0:w:"0x$(FUSE0)":m \
-        -U fuse1:w:"0x$(FUSE1)":m \
-        -U fuse2:w:"0x$(FUSE2)":m \
-        -U fuse4:w:"0x$(FUSE4)":m \
-        -U fuse5:w:"0x$(FUSE5)":m
+  ifeq ($(XMEGA_SERIES), A)
+    AVRDUDE_DEVICE_FUSES=\
+          -U fuse0:w:"0x$(FUSE0)":m \
+          -U fuse1:w:"0x$(FUSE1)":m \
+          -U fuse2:w:"0x$(FUSE2)":m \
+          -U fuse4:w:"0x$(FUSE4)":m \
+          -U fuse5:w:"0x$(FUSE5)":m
+  else ifeq ($(XMEGA_SERIES), C)
+  # No jtag fuse in C series (FUSE0)
+    AVRDUDE_DEVICE_FUSES=\
+          -U fuse1:w:"0x$(FUSE1)":m \
+          -U fuse2:w:"0x$(FUSE2)":m \
+          -U fuse4:w:"0x$(FUSE4)":m \
+          -U fuse5:w:"0x$(FUSE5)":m
+  else
+    $(error "Unknown xmega series $(XMEGA_SERIES)")
+  endif
 endif
 
 ifndef AVRDUDE_DEVICE_LOCK
