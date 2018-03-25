@@ -70,19 +70,24 @@ CDEFS += -DXMEGA_PIN_COUNT=$(XMEGA_PIN_COUNT)
 
 ifndef AVRDUDE_DEVICE_FUSES
   ifeq ($(XMEGA_SERIES), A)
+    # Note: the JTAGEN bit in FUSE4 is not read correctly when changed until
+    # after the device is reset. This means that avrdude will fail to verify
+    # FUSE4 when writing, but it will still be written correctly. So we write
+    # it last so even though it will fail to verify, it will be written still
+    # be written corectly.
     AVRDUDE_DEVICE_FUSES=\
           -U fuse0:w:"0x$(FUSE0)":m \
           -U fuse1:w:"0x$(FUSE1)":m \
           -U fuse2:w:"0x$(FUSE2)":m \
-          -U fuse4:w:"0x$(FUSE4)":m \
-          -U fuse5:w:"0x$(FUSE5)":m
+          -U fuse5:w:"0x$(FUSE5)":m \
+          -U fuse4:w:"0x$(FUSE4)":m
   else ifeq ($(XMEGA_SERIES), C)
   # No jtag fuse in C series (FUSE0)
     AVRDUDE_DEVICE_FUSES=\
           -U fuse1:w:"0x$(FUSE1)":m \
           -U fuse2:w:"0x$(FUSE2)":m \
-          -U fuse4:w:"0x$(FUSE4)":m \
-          -U fuse5:w:"0x$(FUSE5)":m
+          -U fuse5:w:"0x$(FUSE5)":m \
+          -U fuse4:w:"0x$(FUSE4)":m
   else
     $(error "Unknown xmega series $(XMEGA_SERIES)")
   endif
