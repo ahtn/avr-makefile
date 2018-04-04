@@ -24,7 +24,8 @@ ifndef BOARD
 endif
 
 # Look for the board appropriate board .mk file to include
-include xusb-boot/avr-makefile/boards.mk
+AVR_MK_FILE_DIR = ./avr-makefile
+include $(AVR_MK_FILE_DIR)/boards.mk
 
 #######################################################################
 #                         programmer options                          #
@@ -65,6 +66,7 @@ LD_SCRIPT_DIR = /usr/lib/ldscripts
 all: hex fuse
 
 include avr-makefile/avr.mk
+include avr-makefile/avr-program.mk
 
 # Listing of phony targets.
 .PHONY : all begin finish end sizebefore sizeafter gccversion \
