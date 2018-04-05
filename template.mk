@@ -31,7 +31,8 @@ include $(AVR_MK_FILE_DIR)/boards.mk
 #                         programmer options                          #
 #######################################################################
 
-AVRDUDE_CMD=avrdude -p $(AVRDUDE_PART) -c avrispmkII
+AVRDUDE_PROGRAMMER = usbasp
+AVRDUDE_CMD = avrdude -p $(MCU) -c $(AVRDUDE_PROGRAMMER)
 
 #######################################################################
 #                           compiler setup                            #
@@ -60,8 +61,9 @@ CSTANDARD = -std=gnu99
 CDEFS +=
 ADEFS +=
 
-LD_SCRIPT_DIR = /usr/lib/ldscripts
-# LD_SCRIPT_DIR = ./ld-scripts
+#######################################################################
+#                               recipes                               #
+#######################################################################
 
 all: hex fuse
 
