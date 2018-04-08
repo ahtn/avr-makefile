@@ -49,27 +49,27 @@ endif
 
 ifeq ($(BOOTSZ_TYPE), 0)
   ifeq ($(BOOT_SIZE), 512)
-	BOOTSZ = 11
+    BOOTSZ = 11
   else ifeq ($(BOOT_SIZE), 1024)
-	BOOTSZ = 10
+    BOOTSZ = 10
   else ifeq ($(BOOT_SIZE), 2048)
-	BOOTSZ = 01
+    BOOTSZ = 01
   else ifeq ($(BOOT_SIZE), 4096)
-	BOOTSZ = 00
+    BOOTSZ = 00
   else
-	$(error Unsupported BOOT_SIZE='$(BOOT_SIZE)')
+    $(error Unsupported BOOT_SIZE='$(BOOT_SIZE)')
   endif
 else ifeq ($(BOOTSZ_TYPE), 1)
   ifeq ($(BOOT_SIZE), 1024)
-	BOOTSZ = 11
+    BOOTSZ = 11
   else ifeq ($(BOOT_SIZE), 2048)
-	BOOTSZ = 10
+    BOOTSZ = 10
   else ifeq ($(BOOT_SIZE), 4096)
-	BOOTSZ = 01
+    BOOTSZ = 01
   else ifeq ($(BOOT_SIZE), 8192)
-	BOOTSZ = 00
+    BOOTSZ = 00
   else
-	$(error Unsupported BOOT_SIZE='$(BOOT_SIZE)')
+    $(error Unsupported BOOT_SIZE='$(BOOT_SIZE)')
   endif
 endif
 
