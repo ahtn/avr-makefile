@@ -156,7 +156,7 @@ $(BUILD_TARGET_DIR):
 	mkdir -p $(BUILD_TARGET_DIR)
 
 elf: $(BUILD_TARGET_DIR) $(TARGET_ELF)
-hex: $(BUILD_TARGET_DIR) $(TARGET_HEX) pretty_size
+hex: $(BUILD_TARGET_DIR) $(TARGET_HEX)
 fuse: $(BUILD_TARGET_DIR) $(TARGET_FUSE)
 lock: $(BUILD_TARGET_DIR) $(TARGET_LOCK)
 eep: $(BUILD_TARGET_DIR) $(TARGET_EEP)
@@ -176,30 +176,30 @@ BUILD_IDENTIFIER = $(BUILD_DIR)_$(BOARD)_$(MCU)
 OLD_FLASH_SIZE = $(BUILD_DIR)/.old_flash_size_$(BUILD_IDENTIFIER).o
 OLD_RAM_SIZE = $(BUILD_DIR)/.old_ram_size_$(BUILD_IDENTIFIER).o
 
-# pretty_size: # would be nice to add get total ram size
-# 	@if test -f $(TARGET_ELF); then \
-#         echo "=== ELF Size Information ($(TARGET)) ==="; \
-# 	echo "$$($(SIZE) $(TARGET_ELF))";  \
-#         echo "=== Size Information ($(TARGET)) ==="; \
-#         oldFlashSize=$$(cat $(OLD_FLASH_SIZE) 2>/dev/null) ; \
-#         oldRamSize=$$(cat $(OLD_RAM_SIZE) 2>/dev/null) ; \
-#         if [[ $$oldFlashSize -eq "" ]]; then \
-#             oldFlashSize=0; \
-#         fi; \
-#         if [[ $$oldRamSize -eq "" ]]; then \
-#             oldRamSize=0; \
-#         fi; \
-#         sizeData=$$($(ELFSIZE)); \
-#         newFlashSize=$$( echo "$$sizeData" | grep Program | awk '{ printf $$2 }'); \
-#         newRamSize=$$( echo "$$sizeData" | grep Data | awk '{ printf $$2 }'); \
-#         echo flash size: $$newFlashSize ; \
-#         echo flash delta: $$(($$newFlashSize - $$oldFlashSize)) ; \
-#         echo ram size: $$newRamSize ;\
-#         echo ram delta: $$(($$newRamSize - $$oldRamSize)) ; \
-#         echo $$newFlashSize > $(OLD_FLASH_SIZE) ; \
-#         echo $$newRamSize > $(OLD_RAM_SIZE) ; \
-#         echo; \
-#     fi
+pretty_size: # would be nice to add get total ram size
+	@if test -f $(TARGET_ELF); then \
+        echo "=== ELF Size Information ($(TARGET)) ==="; \
+	echo "$$($(SIZE) $(TARGET_ELF))";  \
+        echo "=== Size Information ($(TARGET)) ==="; \
+        oldFlashSize=$$(cat $(OLD_FLASH_SIZE) 2>/dev/null) ; \
+        oldRamSize=$$(cat $(OLD_RAM_SIZE) 2>/dev/null) ; \
+        if [[ $$oldFlashSize -eq "" ]]; then \
+            oldFlashSize=0; \
+        fi; \
+        if [[ $$oldRamSize -eq "" ]]; then \
+            oldRamSize=0; \
+        fi; \
+        sizeData=$$($(ELFSIZE)); \
+        newFlashSize=$$( echo "$$sizeData" | grep Program | awk '{ printf $$2 }'); \
+        newRamSize=$$( echo "$$sizeData" | grep Data | awk '{ printf $$2 }'); \
+        echo flash size: $$newFlashSize ; \
+        echo flash delta: $$(($$newFlashSize - $$oldFlashSize)) ; \
+        echo ram size: $$newRamSize ;\
+        echo ram delta: $$(($$newRamSize - $$oldRamSize)) ; \
+        echo $$newFlashSize > $(OLD_FLASH_SIZE) ; \
+        echo $$newRamSize > $(OLD_RAM_SIZE) ; \
+        echo; \
+    fi
 
 # Create final output files (.hex, .eep) from ELF output file.
 %.hex: %.elf
