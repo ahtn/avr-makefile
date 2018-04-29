@@ -155,6 +155,15 @@ build: elf hex
 $(BUILD_TARGET_DIR):
 	mkdir -p $(BUILD_TARGET_DIR)
 
+print_build_info:
+	@echo "### Build settings ###"
+	@echo -e "TARGET:\t$(TARGET)"
+	@echo -e "BOARD:\t$(BOARD)"
+	@echo -e "MCU:\t$(MCU)"
+	@echo "compiler c flags:"
+	@echo "$(ALL_CFLAGS)"
+	@echo ""
+
 elf: $(BUILD_TARGET_DIR) $(TARGET_ELF)
 hex: $(BUILD_TARGET_DIR) $(TARGET_HEX)
 fuse: $(BUILD_TARGET_DIR) $(TARGET_FUSE)
@@ -203,41 +212,35 @@ pretty_size: # would be nice to add get total ram size
 
 # Create final output files (.hex, .eep) from ELF output file.
 %.hex: %.elf
-	@echo
 	@echo $(MSG_FLASH) $@
-	$(OBJCOPY) -O $(FORMAT) -R .eeprom -R .fuse -R .lock $< $@
+	@$(OBJCOPY) -O $(FORMAT) -R .eeprom -R .fuse -R .lock $< $@
 
 %.fuse: %.elf
-	@echo
 	@echo $(MSG_FLASH) $@
-	$(OBJCOPY) -O $(FORMAT) -j .fuse $< $@
+	@$(OBJCOPY) -O $(FORMAT) -j .fuse $< $@
 
 # # extract the fuse section from the elf file
 # $(TARGET).fuse: $(TARGET).elf
 # 	avr-objcopy -O $(FORMAT) -j .fuse --change-section-lma .fuse=$(FUSE_SECTION_START) $< $@
 
 %.lock: %.elf
-	@echo
 	@echo $(MSG_FLASH) $@
-	$(OBJCOPY) -O $(FORMAT) -j .lock $< $@
+	@$(OBJCOPY) -O $(FORMAT) -j .lock $< $@
 
 %.eep: %.elf
-	@echo
 	@echo $(MSG_EEPROM) $@
 	-$(OBJCOPY) -j .eeprom --set-section-flags=.eeprom="alloc,load" \
 	--change-section-lma .eeprom=0 --no-change-warnings -O $(FORMAT) $< $@ || exit 0
 
 # Create extended listing file from ELF output file.
 %.lss: %.elf
-	@echo
 	@echo $(MSG_EXTENDED_LISTING) $@
-	$(OBJDUMP) -h -S -z $< > $@
+	@$(OBJDUMP) -h -S -z $< > $@
 
 # Create a symbol table from ELF output file.
 %.sym: %.elf
-	@echo
 	@echo $(MSG_SYMBOL_TABLE) $@
-	$(NM) -n $< > $@
+	@$(NM) -n $< > $@
 
 
 # Treat the makefiles as dependencies to all object files so that the project
@@ -248,30 +251,29 @@ $(OBJ): $(MAKEFILE_INC)
 .SECONDARY : $(TARGET_ELF)
 .PRECIOUS : $(OBJ)
 %.elf: $(OBJ)
-	@echo
 	@echo $(MSG_LINKING) $@
-	$(CC) $(ALL_CFLAGS) $^ --output $@ $(LDFLAGS)
+	@$(CC) $(ALL_CFLAGS) $^ --output $@ $(LDFLAGS)
 
 # Compile: create object files from C source files.
 $(OBJ_DIR)/%.o : %.c
-	@echo
 	@echo $(MSG_COMPILING) $<
 	@mkdir -p $(dir $@)
 	@mkdir -p $(DEP_DIR)
-	$(CC) -c $(ALL_CFLAGS) $< -o $@
-	# TODO:
-	# $(CC) -S $(ALL_CFLAGS) $< -o $@.asm -fverbose-asm # generate asm as well
+	@$(CC) -c $(ALL_CFLAGS) $< -o $@
+#   build the assembly file as well if requested
+	@if [[ "$(GENERATE_ASM)" ]]; then \
+		$(CC) -S $(ALL_CFLAGS) $< -o $@.asm -fverbose-asm; \
+	fi
 
 # Assemble: create object files from assembler source files.
 $(OBJ_DIR)/%.o : %.S
-	@echo
 	@echo $(MSG_ASSEMBLING) $<
 	@mkdir -p $(dir $@)
-	$(CC) -c $(ALL_ASFLAGS) $< -o $@
+	@$(CC) -c $(ALL_ASFLAGS) $< -o $@
 
 # Compile: create assembler files from C source files.
 %.s : %.c
-	$(CC) -S $(ALL_CFLAGS) $< -o $@
+	@$(CC) -S $(ALL_CFLAGS) $< -o $@
 
 # Target: clean project.
 clean:
@@ -291,4 +293,5 @@ clean:
 -include $(wildcard $(DEP_DIR)/*)
 
 .PHONY : all begin finish end pretty_size gccversion \
-build elf hex eep lss sym coff extcoff clean
+build elf hex eep lss sym coff extcoff clean print_build_info
+# vim:noet:
