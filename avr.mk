@@ -9,6 +9,10 @@ ifndef AVR_MKFILE_DIR
   AVR_MKFILE_DIR = ./avr-makefile
 endif
 
+ifndef SHELL
+  SHELL = /bin/bash
+endif
+
 #######################################################################
 #                          Compiler Options                           #
 #######################################################################
@@ -261,7 +265,8 @@ $(OBJ_DIR)/%.o : %.c
 	@mkdir -p $(DEP_DIR)
 	@$(CC) -c $(ALL_CFLAGS) $< -o $@
 #   build the assembly file as well if requested
-	@if [[ "$(GENERATE_ASM)" ]]; then \
+	@set -e; \
+	if [[ "$(GENERATE_ASM)" ]]; then \
 		$(CC) -S $(ALL_CFLAGS) $< -o $@.asm -fverbose-asm; \
 	fi
 
