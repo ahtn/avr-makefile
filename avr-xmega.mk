@@ -54,10 +54,10 @@ else ifeq ($(MCU), atxmega64a3u)
 else ifeq ($(MCU), atxmega128a3u)
   BOOT_SECTION_START = 0x020000
   BOOTLOADER_SIZE = 0x2000
-  AVRDUDE_PART = x128a4
-  MCU_STRING = ATxmega128A4U
+  AVRDUDE_PART = x128a3
+  MCU_STRING = ATxmega128A3U
   MCU_FLASH_SIZE = 128
-  LD_SCRIPT = avrxmega7.xn
+  LD_SCRIPT = avrxmega6.xn
   XMEGA_PIN_COUNT = 64
   XMEGA_SERIES = A
 else ifeq ($(MCU), atxmega32c3)
@@ -82,7 +82,7 @@ else ifeq ($(MCU), atxmega64a1u)
   BOOT_SECTION_START = 0x010000
   BOOTLOADER_SIZE = 0x1000
   AVRDUDE_PART = x64a1u
-  LD_SCRIPT = avrxmega4.xn
+  LD_SCRIPT = avrxmega5.xn
   MCU_STRING = ATxmega64A1U
   MCU_FLASH_SIZE = 64
   XMEGA_PIN_COUNT = 100
