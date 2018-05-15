@@ -1,5 +1,5 @@
 
-AVRDUDE_EXTRA = -C +$(AVR_MKFILE_DIR)/avrdude-extra.conf
+AVRDUDE_EXTRA = -C +$(AVR_MKFILE_PATH)/avrdude-extra.conf
 
 # program a board using an external programmer
 program-hard: $(TARGET_HEX)

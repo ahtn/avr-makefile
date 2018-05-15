@@ -5,8 +5,8 @@
 # Wunsch, et al which is released under the Public Domain.
 #
 
-ifndef AVR_MKFILE_DIR
-  AVR_MKFILE_DIR = ./avr-makefile
+ifndef AVR_MKFILE_PATH
+  AVR_MKFILE_PATH = ./avr-makefile
 endif
 
 ifndef SHELL
