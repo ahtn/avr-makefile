@@ -117,6 +117,8 @@ endef
 #Create lists of object files need to build the program
 C_OBJ_FILES = $(call obj_file_list, $(C_SRC),o)
 C_LST_FILES = $(call obj_file_list, $(C_SRC),lst)
+C_DEP_FILES = $(call obj_file_list, $(C_SRC),d)
+
 ASM_OBJ_FILES = $(call obj_file_list, $(ASM_SRC),o)
 ASM_LST_FILES = $(call obj_file_list, $(ASM_src),lst)
 
@@ -158,7 +160,7 @@ MSG_CREATING_LIBRARY = Creating library:
 #######################################################################
 
 # Compiler flags to generate dependency files.
-GENDEPFLAGS = -MMD -MP -MF $(DEP_DIR)/$(@F).d
+GENDEPFLAGS = -MMD -MP
 
 # Combine all necessary flags and optional flags.
 # Add target processor to flags.
@@ -311,7 +313,6 @@ $(call $(2))
 endef
 
 define c_file_recipe
-	@mkdir -p $$(DEP_DIR)
 	@$(CC) -c $$(ALL_CFLAGS) $$< -o $$@
 # # build the assembly file as well if requested
 	@set -e; \
@@ -349,10 +350,9 @@ clean:
 	$(REMOVE) $(TARGET_SYM)
 	$(REMOVE) $(TARGET_MAP)
 	$(REMOVEDIR) $(OBJ_DIR)
-	$(REMOVEDIR) $(DEP_DIR)
 
 # Include the dependency files.
--include $(wildcard $(DEP_DIR)/*)
+-include $(C_DEP_FILES)
 
 .PHONY : all begin finish end pretty_size gccversion \
 build elf hex eep lss sym coff extcoff clean print_build_info
