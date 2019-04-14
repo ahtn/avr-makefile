@@ -92,11 +92,33 @@ ADEFS += -D __$(DEVICE)__
 #                              obj files                              #
 #######################################################################
 
+# When creating object file names we replace `..` with this value
+REL_DIR_SUBST ?= D..
+
+# This function takes a source file path and converts it to a build file path.
+#
+# For example:
+# source_file: ../../src/test.c
+# obj_file: $(OBJ_DIR)/D../D...src/test.c.o
+#
+# $1: source file to manipulate
+# $2: object file extension to be appended
+define obj_file_name
+$(OBJ_DIR)/$(strip $(subst ..,$(REL_DIR_SUBST),$(1).$(2)))
+endef
+
+# Apply `obj_file_name` to a list of source files
+# $1: list of source files
+# $2: object file extension
+define obj_file_list
+$(foreach src_file, $(1), $(call obj_file_name, $(src_file),$(2)))
+endef
+
 #Create lists of object files need to build the program
-C_OBJ_FILES = $(patsubst %.c, $(OBJ_DIR)/%.o, $(C_SRC))
-C_LST_FILES = $(patsubst %.c, $(OBJ_DIR)/%.lst, $(C_SRC))
-ASM_OBJ_FILES = $(patsubst %.S, $(OBJ_DIR)/%.o, $(ASM_SRC))
-ASM_LST_FILES = $(patsubst %.S, $(OBJ_DIR)/%.lst, $(ASM_SRC))
+C_OBJ_FILES = $(call obj_file_list, $(C_SRC),o)
+C_LST_FILES = $(call obj_file_list, $(C_SRC),lst)
+ASM_OBJ_FILES = $(call obj_file_list, $(ASM_SRC),o)
+ASM_LST_FILES = $(call obj_file_list, $(ASM_src),lst)
 
 OBJ = $(C_OBJ_FILES) $(ASM_OBJ_FILES)
 LST = $(C_LST_FILES) $(ASM_LST_FILES)
@@ -276,23 +298,40 @@ $(OBJ): $(MAKEFILE_INC)
 	@echo $(MSG_LINKING) $@
 	@$(CC) $(ALL_CFLAGS) $^ --output $@ $(LDFLAGS)
 
-# Compile: create object files from C source files.
-$(OBJ_DIR)/%.o : %.c
-	@echo $(MSG_COMPILING) $<
-	@mkdir -p $(dir $@)
-	@mkdir -p $(DEP_DIR)
-	@$(CC) -c $(ALL_CFLAGS) $< -o $@
-#   build the assembly file as well if requested
-	@set -e; \
-	if [[ "$(GENERATE_ASM)" ]]; then \
-		$(CC) -S $(ALL_CFLAGS) $< -o $@.asm -fverbose-asm; \
-	fi
 
-# Assemble: create object files from assembler source files.
-$(OBJ_DIR)/%.o : %.S
-	@echo $(MSG_ASSEMBLING) $<
-	@mkdir -p $(dir $@)
-	@$(CC) -c $(ALL_ASFLAGS) $< -o $@
+# This function provides a build rule for a source file.
+#
+# $1: source file to manipulate
+# $2: recipe code
+define define_compile_rule
+$(call obj_file_name,$(1),o): $(1)
+	@echo $(MSG_COMPILING) $$<
+	@mkdir -p $$(dir $$@)
+$(call $(2))
+endef
+
+define c_file_recipe
+	@mkdir -p $$(DEP_DIR)
+	@$(CC) -c $$(ALL_CFLAGS) $$< -o $$@
+# # build the assembly file as well if requested
+	@set -e; \
+	if [[ "$$(GENERATE_ASM)" ]]; then \
+		$(CC) -S $$(ALL_CFLAGS) $$< -o $$@.asm -fverbose-asm; \
+	fi
+endef
+
+define asm_file_recipe
+	@$(CC) -c $$(ALL_ASFLAGS) $$< -o $$@
+endef
+
+# Create the recipes for the object files
+$(foreach src_file, $(C_SRC), \
+	$(eval $(call define_compile_rule, $(src_file), c_file_recipe) ) \
+)
+
+$(foreach src_file, $(ASM_SRC), \
+	$(eval $(call define_compile_rule, $(src_file), asm_file_recipe) ) \
+)
 
 # Compile: create assembler files from C source files.
 %.s : %.c
